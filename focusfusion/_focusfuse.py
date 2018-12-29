@@ -2,6 +2,9 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 
+from ._algorithms.dct_spatial_freq import fuse_images as fuse_dct_spatial_freq
+from ._algorithms.dct_spatial_freq import DEFAULT_DECISION_THRESHOLD
+
 from ._algorithms.guided_filter import fuse_images as fuse_guided_filter
 from ._algorithms.guided_filter import DEFAULT_DECOMPOSE_AVERAGE_RADIUS, \
                                        DEFAULT_GUIDED_RADIUS_BASE, \
@@ -64,7 +67,15 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
             used to influence the runtime of the algorithm and the quality of
             the fusion result (see `**kwargs**).
 
-        'linear_filters' (based on [3])
+        'dct_spatial_freq' (based on [3])
+            Accepts exactly two grayscale input images. The images are fused on
+            an 8x8 block basis by applying the discrete cosine transform to each
+            of these blocks and comparing the results. This is potentially very
+            fast (the algorithm is not yet highly optimized) but prone to
+            artefacts (the current implementation does not perform as well as
+            the original paper would imply).
+
+        'linear_filters' (based on [4])
             Accepts exactly two grayscale input images. This algorithm assumes
             that the first input image depicts a scene with an out-of-focus
             background and the second depicts the same scene with an
@@ -113,6 +124,13 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
                 *Matching pursuit* error threshold. Larger values can improve
                 runtime at the cost of fusion result quality.
 
+        'dct_spatial_freq'
+            decision_threshold : float (default is {DEFAULT_DECISION_THRESHOLD})
+                Each 8x8 block of the fusion result is obtained either directly
+                from one of the input images or by averaging the corresponding
+                blocks in both of them. The lower the decision threshold, the
+                less likely it is that blocks will be averaged in this way.
+
         'linear_filters'
             blur_radius_fg : float (default is {DEFAULT_BLUR_RADIUS_FG})
                 Controls foreground blur in fused image, a value of 0.0
@@ -146,7 +164,12 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
            Sparse Representation*, in *IEEE Transactions on Instrumentation and
            Measurement*, vol. 59, no. 4, pp. 884-892, April 2010.
 
-    .. [3] A. Kubota and K. Aizawa, *Reconstructing arbitrarily focused images
+    .. [3] L. Cao, L. Jin, H. Tao, G. Li, Z. Zhuang and Y. Zhang.,
+           *Multi-Focus Image Fusion Based on Spatial Frequency in Discrete
+           Cosine Transform Domain*, in *IEEE Signal Processing Letters*,
+           vol. 22, no. 2, pp. 220-224, Feb. 2015.
+
+    .. [4] A. Kubota and K. Aizawa, *Reconstructing arbitrarily focused images
            from two differently focused images using linear filters*, in *IEEE
            Transactions on Image Processing*, vol. 14, no. 11, pp. 1848-1859,
            Nov. 2005.
@@ -200,6 +223,7 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
             self.rgb_only = rgb_only
 
     algo = {
+        'dct_spatial_freq': FusionAlgorithm(fuse_dct_spatial_freq, num_inputs=2),
         'guided_filter': FusionAlgorithm(fuse_guided_filter),
         'linear_filters': FusionAlgorithm(fuse_linear_filters, num_inputs=2),
         'sparse_repr': FusionAlgorithm(fuse_sparse_repr),
@@ -244,6 +268,7 @@ focusfuse.__doc__ = focusfuse.__doc__.format(
     DEFAULT_BLOCK_SIZE=DEFAULT_BLOCK_SIZE,
     DEFAULT_BLUR_RADIUS_BG=DEFAULT_BLUR_RADIUS_BG,
     DEFAULT_BLUR_RADIUS_FG=DEFAULT_BLUR_RADIUS_FG,
+    DEFAULT_DECISION_THRESHOLD=DEFAULT_DECISION_THRESHOLD,
     DEFAULT_DECOMPOSE_AVERAGE_RADIUS=DEFAULT_DECOMPOSE_AVERAGE_RADIUS,
     DEFAULT_GUIDED_EPS_BASE=DEFAULT_GUIDED_EPS_BASE,
     DEFAULT_GUIDED_EPS_DETAIL=DEFAULT_GUIDED_EPS_DETAIL,
