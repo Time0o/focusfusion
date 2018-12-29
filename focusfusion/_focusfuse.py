@@ -2,6 +2,13 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 
+from ._algorithms.guided_filter import fuse_images as fuse_guided_filter
+from ._algorithms.guided_filter import DEFAULT_DECOMPOSE_AVERAGE_RADIUS, \
+                                       DEFAULT_GUIDED_RADIUS_BASE, \
+                                       DEFAULT_GUIDED_EPS_BASE, \
+                                       DEFAULT_GUIDED_RADIUS_DETAIL, \
+                                       DEFAULT_GUIDED_EPS_DETAIL
+
 from ._algorithms.linear_filters import fuse_images as fuse_linear_filters
 from ._algorithms.linear_filters import DEFAULT_BLUR_RADIUS_FG, \
                                         DEFAULT_BLUR_RADIUS_BG
@@ -42,7 +49,13 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
         optional parameters passed as keyword arguments and outlined under
         `**kwargs`. Accepted values for this parameter are:
 
-        'sparse_repr' (based on [1])
+        'guided_filter' (based on [1])
+            Fuse an arbitrary number of grayscale images depicting the same
+            scene with different in-focus regions by weighted summation of base
+            and detail layers of the input images (with weights obtained via
+            guided filtering of discretized saliency maps).
+
+        'sparse_repr' (based on [2])
             Fuse an arbitrary number of grayscale images depicting the same
             scene with different in-focus regions by transforming them into
             sparse representation matrices using some variant of the *matching
@@ -51,7 +64,7 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
             used to influence the runtime of the algorithm and the quality of
             the fusion result (see `**kwargs**).
 
-        'linear_filters' (based on [2])
+        'linear_filters' (based on [3])
             Accepts exactly two grayscale input images. This algorithm assumes
             that the first input image depicts a scene with an out-of-focus
             background and the second depicts the same scene with an
@@ -61,6 +74,23 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
             or fore- and background in the fused image (see `**kwargs).
 
     **kwargs:
+        'guided_filter'
+            decompose_average_radius : int (default is {DEFAULT_DECOMPOSE_AVERAGE_RADIUS})
+                Radius of the averaging filter used during the composition of
+                each input image into base and detail layer.
+            guided_radius_base : int (default is {DEFAULT_GUIDED_RADIUS_BASE})
+                Radius of the guided filter used to smooth the base layer weight
+                maps.
+            guided_eps_base : float (default is {DEFAULT_GUIDED_EPS_BASE})
+                Regularization parameter of the guided filter used to smooth the
+                base layer weight maps.
+            guided_radius_detail : int (default is {DEFAULT_GUIDED_RADIUS_DETAIL})
+                Radius of the guided filter used to smooth the detail layer
+                weight maps.
+            guided_eps_detail : float
+                Regularization parameter of the guided filter used to smooth the
+                detail layer weight maps.
+
         'sparse_repr'
             block_size : int (default is {DEFAULT_BLOCK_SIZE})
                 Each input image is transformed into a sparse representation
@@ -108,11 +138,15 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
 
     References
     ----------
-    .. [1] B. Yang and S. Li, *Multifocus Image Fusion and Restoration With
+    .. [1] S. Li, X. Kang and J. Hu, *Image Fusion With Guided Filtering*, in
+           *IEEE Transactions on Image Processing*, vol. 22, no. 7,
+           pp. 2864-2875, July 2013.
+
+    .. [2] B. Yang and S. Li, *Multifocus Image Fusion and Restoration With
            Sparse Representation*, in *IEEE Transactions on Instrumentation and
            Measurement*, vol. 59, no. 4, pp. 884-892, April 2010.
 
-    .. [2] A. Kubota and K. Aizawa, *Reconstructing arbitrarily focused images
+    .. [3] A. Kubota and K. Aizawa, *Reconstructing arbitrarily focused images
            from two differently focused images using linear filters*, in *IEEE
            Transactions on Image Processing*, vol. 14, no. 11, pp. 1848-1859,
            Nov. 2005.
@@ -166,6 +200,7 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
             self.rgb_only = rgb_only
 
     algo = {
+        'guided_filter': FusionAlgorithm(fuse_guided_filter),
         'linear_filters': FusionAlgorithm(fuse_linear_filters, num_inputs=2),
         'sparse_repr': FusionAlgorithm(fuse_sparse_repr),
     }.get(algorithm)
@@ -211,4 +246,9 @@ focusfuse.__doc__ = focusfuse.__doc__.format(
     DEFAULT_BLOCK_SIZE=DEFAULT_BLOCK_SIZE,
     DEFAULT_MP_METHOD=DEFAULT_MP_METHOD,
     DEFAULT_MP_ITER_MAX=DEFAULT_MP_ITER_MAX,
-    DEFAULT_MP_GLOBAL_EPS=DEFAULT_MP_GLOBAL_EPS)
+    DEFAULT_MP_GLOBAL_EPS=DEFAULT_MP_GLOBAL_EPS,
+    DEFAULT_DECOMPOSE_AVERAGE_RADIUS=DEFAULT_DECOMPOSE_AVERAGE_RADIUS,
+    DEFAULT_GUIDED_EPS_BASE=DEFAULT_GUIDED_EPS_BASE,
+    DEFAULT_GUIDED_EPS_DETAIL=DEFAULT_GUIDED_EPS_DETAIL,
+    DEFAULT_GUIDED_RADIUS_BASE=DEFAULT_GUIDED_RADIUS_BASE,
+    DEFAULT_GUIDED_RADIUS_DETAIL=DEFAULT_GUIDED_RADIUS_DETAIL)
