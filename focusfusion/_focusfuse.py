@@ -93,7 +93,8 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
     -------
     fused : ndarray
         Fused all-in-focus (except for some specific `algorithm`/`**kwargs`
-        combinations) image.
+        combinations) image. Regardless of the dtypes of the input images this
+        array will be of dtype 'double'.
 
     Raises
     ------
@@ -184,9 +185,18 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
         raise ValueError(err.format(algorithm))
 
     if algo.num_inputs is None:
-        return algo.function(images, **kwargs)
+        res = algo.function(images, **kwargs)
     else:
-        return algo.function(*images, **kwargs)
+        res = algo.function(*images, **kwargs)
+
+    # make sure result is a numpy array
+    res = np.array(res, dtype='double')
+
+    # normalize result to range [0, 1]
+    res -= res.min()
+    res /= res.max()
+
+    return res
 
 
 focusfuse.__doc__ = focusfuse.__doc__.format(
