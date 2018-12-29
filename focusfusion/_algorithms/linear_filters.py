@@ -20,10 +20,6 @@ def blur_estimate(img_focussed: np.ndarray,
                   radius: float = BLUR_ESTIMATE_RADIUS,
                   thresh: float = BLUR_ESTIMATE_THRESH) -> float:
 
-    # convert images to floating point
-    img_focussed = img_focussed.astype('double')
-    img_unfocussed = img_unfocussed.astype('double')
-
     # pre-compute reference errors
     err_ref = blur_error(img_focussed, img_unfocussed, *img_focussed.shape, radius)
 

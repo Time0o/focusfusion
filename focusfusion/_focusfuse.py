@@ -12,6 +12,8 @@ from ._algorithms.sparse_repr import DEFAULT_BLOCK_SIZE, \
                                      DEFAULT_MP_ITER_MAX, \
                                      DEFAULT_MP_GLOBAL_EPS
 
+from ._common.images import normalize
+
 
 def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
     """Fuse a series of images depicting the same scene but with different
@@ -184,6 +186,10 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
         err = "'{}' expects rgb only input images but one or more grayscale images were provided"
         raise ValueError(err.format(algorithm))
 
+    # normalize input images
+    images = [normalize(img) for img in images]
+
+    # run fusion algorithm
     if algo.num_inputs is None:
         res = algo.function(images, **kwargs)
     else:
