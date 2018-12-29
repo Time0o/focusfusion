@@ -44,7 +44,7 @@ def get_average_filter(
 ) -> Callable[[np.ndarray], np.ndarray]:
 
     kernel = np.ones(2 * r + 1, dtype='int')
-    counts = box_filter(np.ones(shape, dtype='int'), kernel)
+    counts = apply_filter(np.ones(shape, dtype='int'), kernel)
 
     return lambda img: apply_separable_filter(img, kernel, pad_mode) / counts
 
