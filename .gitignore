@@ -1,0 +1,14 @@
+# directories
+debug
+
+# Python
+__pycache__
+
+# Cython
+*.c
+*.pyc
+
+# build
+build
+dist
+*.egg-info
