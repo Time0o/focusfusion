@@ -4,8 +4,6 @@ from .._common.filters import get_gauss_filter
 from .._cython.linear_filters import blur_error
 
 
-FLOAT_DTYPE = np.float64
-
 BLUR_ESTIMATE_STEPS = 25
 BLUR_ESTIMATE_DELTA = .2
 BLUR_ESTIMATE_RADIUS = 2
@@ -23,8 +21,8 @@ def blur_estimate(img_focussed: np.ndarray,
                   thresh: float = BLUR_ESTIMATE_THRESH) -> float:
 
     # convert images to floating point
-    img_focussed = img_focussed.astype(FLOAT_DTYPE)
-    img_unfocussed = img_unfocussed.astype(FLOAT_DTYPE)
+    img_focussed = img_focussed.astype('double')
+    img_unfocussed = img_unfocussed.astype('double')
 
     # pre-compute reference errors
     err_ref = blur_error(img_focussed, img_unfocussed, *img_focussed.shape, radius)

@@ -4,10 +4,6 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 
-FLOAT_DTYPE = np.float64
-INT_DTYPE = np.int64
-
-
 def apply_filter(img: np.ndarray,
                  kernel: np.ndarray,
                  pad_mode: str = 'constant') -> np.ndarray:
@@ -47,8 +43,8 @@ def get_average_filter(
 
 ) -> Callable[[np.ndarray], np.ndarray]:
 
-    kernel = np.ones(2 * r + 1, dtype=INT_DTYPE)
-    counts = box_filter(np.ones(shape, dtype=INT_DTYPE), kernel)
+    kernel = np.ones(2 * r + 1, dtype='int')
+    counts = box_filter(np.ones(shape, dtype='int'), kernel)
 
     return lambda img: apply_separable_filter(img, kernel, pad_mode) / counts
 
@@ -60,7 +56,7 @@ def get_gauss_filter(
 
 ) -> Callable[[np.ndarray], np.ndarray]:
 
-    x = np.arange(-r, r + 1, dtype=FLOAT_DTYPE)
+    x = np.arange(-r, r + 1, dtype='double')
 
     kernel = np.exp(-(x * x) / (2 * sigma * sigma))
     kernel /= kernel.sum()
