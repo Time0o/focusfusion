@@ -16,7 +16,7 @@ AUTHOR = 'Timo Nicolai'
 AUTHOR_EMAIL = 'timonicolai@arcor.de'
 
 SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
-CYTHON_DIR = os.path.join(SETUP_DIR, 'focusfusion/cython')
+CYTHON_DIR = os.path.join(SETUP_DIR, 'focusfusion/_cython')
 
 
 def get_requirements():

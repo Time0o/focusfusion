@@ -1,7 +1,7 @@
 import numpy as np
 
-from .common.filters import get_gauss_filter
-from .cython.linear_filters import blur_error
+from .._common.filters import get_gauss_filter
+from .._cython.linear_filters import blur_error
 
 
 FLOAT_DTYPE = np.float64
@@ -10,6 +10,9 @@ BLUR_ESTIMATE_STEPS = 25
 BLUR_ESTIMATE_DELTA = .2
 BLUR_ESTIMATE_RADIUS = 2
 BLUR_ESTIMATE_THRESH = .1
+
+DEFAULT_BLUR_RADIUS_FG = 0.
+DEFAULT_BLUR_RADIUS_BG = 0.
 
 
 def blur_estimate(img_focussed: np.ndarray,
@@ -92,8 +95,8 @@ def fft_filtered(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
 
 def fuse_images(img_fg: np.ndarray,
                 img_bg: np.ndarray,
-                blur_radius_fg: float = .0,
-                blur_radius_bg: float = .0) -> np.ndarray:
+                blur_radius_fg: float = DEFAULT_BLUR_RADIUS_FG,
+                blur_radius_bg: float = DEFAULT_BLUR_RADIUS_BG) -> np.ndarray:
 
     assert img_fg.shape == img_bg.shape
 

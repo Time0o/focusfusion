@@ -2,7 +2,9 @@ from typing import List
 
 import numpy as np
 
-from .cython.sparse_repr import construct_dictionary, update_matrix, reconstruct_image
+from .._cython.sparse_repr import construct_dictionary, \
+                                  reconstruct_image, \
+                                  update_matrix
 
 
 DEFAULT_BLOCK_SIZE = 4
