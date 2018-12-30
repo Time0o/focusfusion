@@ -18,7 +18,7 @@ def fuse_images(images: List[np.ndarray],
                 block_size: int = DEFAULT_BLOCK_SIZE,
                 mp_method: str = DEFAULT_MP_METHOD,
                 mp_iter_max: int = DEFAULT_MP_ITER_MAX,
-                mp_global_eps: float = DEFAULT_MP_GLOBAL_EPS):
+                mp_global_eps: float = DEFAULT_MP_GLOBAL_EPS) -> np.ndarray:
 
     num_blocks = np.prod((np.array(images[0].shape) - block_size + 1))
     block_area = block_size**2
