@@ -20,15 +20,15 @@ def fuse_images(images: List[np.ndarray],
                 mp_iter_max: int = DEFAULT_MP_ITER_MAX,
                 mp_global_eps: float = DEFAULT_MP_GLOBAL_EPS):
 
-    num_patches = np.prod((np.array(images[0].shape) - block_size + 1))
-    patch_size = block_size**2
+    num_blocks = np.prod((np.array(images[0].shape) - block_size + 1))
+    block_area = block_size**2
 
-    sparse_dict = np.empty((patch_size, patch_size), dtype='double')
+    sparse_dict = np.empty((block_area, block_area), dtype='double')
     construct_dictionary(sparse_dict)
 
-    sparse_mat = np.empty((patch_size, num_patches), dtype='double')
+    sparse_mat = np.empty((block_area, num_blocks), dtype='double')
 
-    sparse_levels = np.zeros(num_patches, dtype='double')
+    sparse_levels = np.zeros(num_blocks, dtype='double')
 
     for img in images:
         update_matrix(img.astype('double'),
