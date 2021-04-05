@@ -32,9 +32,9 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
     This problem is commonly referred to as *multifocus image fusion* in the
     literature and a wide variety of non-trivial algorithms have been devised to
     solve it accurately and efficiently. This function is a wrapper around
-    independent from-scratch implementations of several of the most influential
-    (i.e. most cited) algorithms of this type, see the description of the
-    `algorithm` parameter for a complete list.
+    independent from-scratch implementations of several methods using classical
+    (i.e. non deep learning based) computer vision techniques. See the
+    description of the `algorithm` parameter for a complete list.
 
     Parameters
     ----------
@@ -176,7 +176,7 @@ def focusfuse(images: List[np.ndarray], algorithm: str, **kwargs) -> np.ndarray:
 
     Examples
     --------
-    >>> from focusfusion import fuse_images
+    >>> from focusfusion import focusfuse
     >>> from skimage.io import imread
     >>> img1 = imread('img1.png')
     >>> img2 = imread('img2.png')
