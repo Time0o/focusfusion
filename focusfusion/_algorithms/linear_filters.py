@@ -21,7 +21,7 @@ def blur_estimate(img_focussed: np.ndarray,
                   thresh: float = BLUR_ESTIMATE_THRESH) -> float:
 
     # pre-compute reference errors
-    err_ref = blur_error(img_focussed, img_unfocussed, *img_focussed.shape, radius)
+    err_ref = blur_error(img_focussed, img_unfocussed, radius)
 
     # determine optimal blur radii
     optimal_blur_radii = np.empty_like(err_ref)
@@ -35,7 +35,7 @@ def blur_estimate(img_focussed: np.ndarray,
         img_blurred = gauss(img_focussed)
 
         # calculate normalized errors
-        err = blur_error(img_blurred, img_unfocussed, *img_blurred.shape, radius)
+        err = blur_error(img_blurred, img_unfocussed, radius)
         residuals = err / err_ref
 
         # update optima
@@ -82,7 +82,10 @@ def fft_filtered(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     freq *= kernel
 
     # remove padding
-    freq = freq[pad_top:-pad_bottom, pad_left:-pad_right]
+    pad_bottom = None if pad_bottom == 0 else -pad_bottom
+    pad_right = None if pad_right == 0 else -pad_right
+
+    freq = freq[pad_top:pad_bottom, pad_left:pad_right]
 
     return np.fft.ifftshift(freq)
 

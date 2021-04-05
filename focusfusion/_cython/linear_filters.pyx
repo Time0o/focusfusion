@@ -8,22 +8,23 @@ cimport numpy as np
 @cython.wraparound(False)
 def blur_error(double[:, ::1] img_fg,
                double[:, ::1] img_bg,
-               int width,
-               int height,
                int radius):
 
+    cdef int m = img_fg.shape[0]
+    cdef int n = img_fg.shape[0]
+
     # allocate accumulator images
-    cdef double[:, ::1] diff = np.empty((width, height),
+    cdef double[:, ::1] diff = np.empty((m, n),
                                         dtype='double')
 
-    cdef double[:, ::1] err = np.empty((width - 2 * radius, height - 2 * radius),
+    cdef double[:, ::1] err = np.empty((m - 2 * radius, n - 2 * radius),
                                        dtype='double')
 
     # compute squared difference between input images
     cdef int row, col
 
-    for row in range(height):
-        for col in range(width):
+    for row in range(m):
+        for col in range(n):
             diff[row, col] = (img_fg[row, col] - img_bg[row, col])**2
 
 
@@ -32,8 +33,8 @@ def blur_error(double[:, ::1] img_fg,
     cdef double acc, eps = np.finfo('double').eps
 
     r = radius
-    for row in range(r, height - r):
-        for col in range(r, width - r):
+    for row in range(r, m - r):
+        for col in range(r, n - r):
 
             acc = 0.
             for row_ in range(row - r, row + r + 1):
