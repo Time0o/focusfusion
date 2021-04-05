@@ -3,6 +3,7 @@ debug
 
 # Python
 __pycache__
+.ipynb_checkpoints
 
 # Cython
 *.c
