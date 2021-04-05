@@ -34,7 +34,7 @@ def construct_dictionary(double[:, ::1] D):
 
     cdef int row, col
 
-    for row in range(n):
+    for row in range(m):
         D[row, 0] = n**(-.5)
 
     for col in range(1, n):
